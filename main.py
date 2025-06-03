@@ -28,7 +28,7 @@ def try_once() -> str | SIG:
         if frame is None:
             raise ScreenshotError("Failed to take screenshot.")
         time_text = extract_time(frame)
-        if not re.match(r"^(\d:)?\d\d?:\d\d$", time_text):
+        if not re.match(r"^(\d:)?(\d\d?:)?\d\d?$", time_text):
             raise OcrError(f"Failed to extract time from screenshot.")
         L.success(f"Extracted time: {time_text}")
         notify(time_text)
