@@ -3,14 +3,18 @@ from stream import BilibiliStream
 from dingtalk import send_dingtalk_message as send
 from pytimeparse.timeparse import timeparse
 from datetime import timedelta
-from ocr import extract_time
+from ocr import ocr
 from utils import *
 import time
-import re
+
 
 is_notified = False
 stream = BilibiliStream(room_id=60989)
 TIME_THRES = timedelta(hours=1, minutes=20, seconds=0)
+LARGE_DELAY = 20 * 60  # 20 minutes
+SMALL_DELAY = 2 * 60   # 2 minutes
+HIGH_FREQ_FAILURE_COUNT_MAX = 3
+OCR_FAILURE_COUNT_MAX = 4
 
 
 def notify(time_text: str):
@@ -27,8 +31,8 @@ def try_once() -> str | SIG:
         frame = stream.screenshot()
         if frame is None:
             raise ScreenshotError("Failed to take screenshot.")
-        time_text = extract_time(frame)
-        if not re.match(r"^(\d:)?(\d\d?:)?\d\d?$", time_text):
+        time_text = ocr(frame)
+        if time_text is None:
             raise OcrError(f"Failed to extract time from screenshot.")
         L.success(f"Extracted time: {time_text}")
         notify(time_text)
@@ -57,11 +61,6 @@ def try_once() -> str | SIG:
 # 在HIGH_FREQ阶段，每隔SMALL_DELAY检测一次，如果try_once连续HIGH_FREQ_FAILURE_COUNT_MAX次失败
 # 则发送另一个消息提醒（同样逻辑先留空），然后直接退出回到IDLE阶段
 def main():
-    LARGE_DELAY = 20 * 60  # 20 minutes
-    SMALL_DELAY = 2 * 60   # 2 minutes
-    HIGH_FREQ_FAILURE_COUNT_MAX = 3
-    OCR_FAILURE_COUNT_MAX = 4
-
     def wait(seconds: int):
         L.info(f"Waiting for {seconds / 60:.1f} minutes...")
         time.sleep(seconds)

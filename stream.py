@@ -109,14 +109,3 @@ class BilibiliStream:
                 raise LiveNotStartedError(f"Room {self.room_id} is not live.")
 
         return data.get("data", {}).get("room_id")
-
-
-if __name__ == "__main__":
-    room_id = 60989
-    stream = BilibiliStream(room_id)
-    frame = stream.screenshot()
-    # cv2.imwrite("snapshot.jpg", frame)
-    from matplotlib import pyplot as plt
-    plt.imshow(frame)
-    plt.axis('off')  # Hide axes
-    plt.show()  # Display the image

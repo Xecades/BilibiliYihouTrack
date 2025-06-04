@@ -1,9 +1,19 @@
 from loguru import logger as L
 import pytesseract
 import cv2
+import re
 
 # x1, y1, x2, y2
 TIME_BBOX = (1606, 342, 1862, 406)
+OCR_REPROCESS_COUNT_MAX = 3
+
+
+def ocr(frame) -> str | None:
+    for _ in range(OCR_REPROCESS_COUNT_MAX):
+        time_text = extract_time(frame)
+        if re.match(r"^(\d:)?(\d\d?:)?\d\d?$", time_text):
+            return time_text
+    return None
 
 
 def extract_time(frame, bbox=TIME_BBOX):
@@ -23,13 +33,3 @@ def extract_time(frame, bbox=TIME_BBOX):
     text = pytesseract.image_to_string(
         roi, config='-c tessedit_char_whitelist=0123456789:')
     return text.strip()
-
-
-if __name__ == "__main__":
-    frame = cv2.imread("snapshot.jpg")
-    bbox = (1606, 342, 1862, 406)
-    cv2.rectangle(frame, (bbox[0], bbox[1]),
-                  (bbox[2], bbox[3]), (0, 255, 0), 2)
-    cv2.imwrite("snapshot_with_bbox.jpg", frame)
-    time_text = extract_time(frame, bbox)
-    print(time_text)
