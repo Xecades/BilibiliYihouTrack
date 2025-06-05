@@ -19,7 +19,7 @@ OCR_FAILURE_COUNT_MAX = 4
 
 def notify(time_text: str):
     global is_notified
-    sec = timeparse(time_text)
+    sec = timeparse(time_text) if ":" in time_text else int(time_text)
     t = timedelta(seconds=sec)
     if not is_notified and t > TIME_THRES:
         send(f"快快快快来直播间❗️当前记录时间：{time_text}")
@@ -29,11 +29,7 @@ def notify(time_text: str):
 def try_once() -> str | SIG:
     try:
         frame = stream.screenshot()
-        if frame is None:
-            raise ScreenshotError("Failed to take screenshot.")
         time_text = ocr(frame)
-        if time_text is None:
-            raise OcrError(f"Failed to extract time from screenshot.")
         L.success(f"Extracted time: {time_text}")
         notify(time_text)
         return time_text

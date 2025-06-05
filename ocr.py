@@ -1,4 +1,5 @@
 from loguru import logger as L
+from utils import OcrError
 import pytesseract
 import cv2
 import re
@@ -13,7 +14,7 @@ def ocr(frame) -> str | None:
         time_text = extract_time(frame)
         if re.match(r"^(\d:)?(\d\d?:)?\d\d?$", time_text):
             return time_text
-    return None
+    raise OcrError(f"Failed to extract time from screenshot. (Got: {time_text})")
 
 
 def extract_time(frame, bbox=TIME_BBOX):

@@ -35,6 +35,8 @@ class BilibiliStream:
             if frame is not None:
                 L.success("Screenshot taken successfully.")
                 break
+        if frame is None:
+            raise ScreenshotError("Failed to take screenshot.")
         return frame
 
     def screenshot_from_url(self, url: str):
