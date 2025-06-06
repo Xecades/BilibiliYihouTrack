@@ -32,5 +32,5 @@ def extract_time(frame, bbox=TIME_BBOX):
     cv2.imwrite("snapshot_thresh.jpg", thresh)
 
     text = pytesseract.image_to_string(
-        roi, config='-c tessedit_char_whitelist=0123456789:')
+        roi, config='--psm 7 -c tessedit_char_whitelist=0123456789:')
     return text.strip()
