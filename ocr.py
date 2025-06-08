@@ -6,18 +6,21 @@ import re
 
 # x1, y1, x2, y2
 TIME_BBOX = (1606, 342, 1862, 406)
-OCR_REPROCESS_COUNT_MAX = 3
+REGEX = r"^(\d:)?(\d\d?:)?\d\d?$"
 
 
 def ocr(frame) -> str | None:
-    for _ in range(OCR_REPROCESS_COUNT_MAX):
-        time_text = extract_time(frame)
-        if re.match(r"^(\d:)?(\d\d?:)?\d\d?$", time_text):
-            return time_text
-    raise OcrError(f"Failed to extract time from screenshot. (Got: {time_text})")
+    time_text = extract_time(frame)
+    if re.match(REGEX, time_text):
+        return time_text
+    time_text = extract_time(frame, psm=True)
+    if re.match(REGEX, time_text):
+        return time_text
+    raise OcrError(
+        f"Failed to extract time from screenshot. Got '{time_text}'")
 
 
-def extract_time(frame, bbox=TIME_BBOX):
+def extract_time(frame, bbox=TIME_BBOX, psm=False) -> str:
     x1, y1, x2, y2 = bbox
     roi = frame[y1:y2, x1:x2]
 
@@ -32,5 +35,5 @@ def extract_time(frame, bbox=TIME_BBOX):
     cv2.imwrite("snapshot_thresh.jpg", thresh)
 
     text = pytesseract.image_to_string(
-        roi, config='--psm 7 -c tessedit_char_whitelist=0123456789:')
+        roi, config='-c tessedit_char_whitelist=0123456789:' + (' --psm 7' if psm else ''))
     return text.strip()
