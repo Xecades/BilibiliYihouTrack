@@ -10,7 +10,7 @@ import time
 
 is_notified = False
 stream = BilibiliStream(room_id=60989)
-TIME_THRES = timedelta(hours=1, minutes=20, seconds=0)
+TIME_THRES = timedelta(hours=1, minutes=0, seconds=0)
 LARGE_DELAY = 20 * 60  # 20 minutes
 SMALL_DELAY = 2 * 60   # 2 minutes
 HIGH_FREQ_FAILURE_COUNT_MAX = 3
