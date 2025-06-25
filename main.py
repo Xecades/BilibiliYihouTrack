@@ -22,7 +22,7 @@ def notify(time_text: str):
     sec = timeparse(time_text) if ":" in time_text else int(time_text)
     t = timedelta(seconds=sec)
     if not is_notified and t > TIME_THRES:
-        send(f"快快快快来直播间❗️当前记录时间：{time_text}")
+        send(f"快快快快来直播间❗️当前纪录时间：{time_text}")
         is_notified = True
 
 
